@@ -14,6 +14,9 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -50,34 +53,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@USE_LIBSTRONGSWAN_TRUE@am__append_1 = libstrongswan
-@USE_LIBHYDRA_TRUE@am__append_2 = libhydra
-@USE_LIBIPSEC_TRUE@am__append_3 = libipsec
-@USE_SIMAKA_TRUE@am__append_4 = libsimaka
-@USE_TLS_TRUE@am__append_5 = libtls
-@USE_RADIUS_TRUE@am__append_6 = libradius
-@USE_LIBTNCIF_TRUE@am__append_7 = libtncif
-@USE_LIBTNCCS_TRUE@am__append_8 = libtnccs
-@USE_LIBPTTLS_TRUE@am__append_9 = libpttls
-@USE_IMCV_TRUE@am__append_10 = libimcv
-@USE_PTS_TRUE@am__append_11 = libpts
-@USE_LIBCHARON_TRUE@am__append_12 = libcharon
-@USE_FILE_CONFIG_TRUE@am__append_13 = starter
-@USE_IPSEC_SCRIPT_TRUE@am__append_14 = ipsec _copyright
-@USE_CHARON_TRUE@am__append_15 = charon
-@USE_NM_TRUE@am__append_16 = charon-nm
-@USE_STROKE_TRUE@am__append_17 = stroke
-@USE_UPDOWN_TRUE@am__append_18 = _updown _updown_espmark
-@USE_TOOLS_TRUE@am__append_19 = openac scepclient pki
-@USE_CONFTEST_TRUE@am__append_20 = conftest
-@USE_DUMM_TRUE@am__append_21 = dumm
-@USE_FAST_TRUE@am__append_22 = libfast
-@USE_MANAGER_TRUE@am__append_23 = manager
-@USE_MEDSRV_TRUE@am__append_24 = medsrv
-@USE_INTEGRITY_TEST_TRUE@am__append_25 = checksum
-@USE_TKM_TRUE@am__append_26 = charon-tkm
-@USE_CMD_TRUE@am__append_27 = charon-cmd
-subdir = src
+ipsec_PROGRAMS = imv_policy_manager$(EXEEXT)
+@USE_IMC_TEST_TRUE@am__append_1 = plugins/imc_test
+@USE_IMV_TEST_TRUE@am__append_2 = plugins/imv_test
+@USE_IMC_SCANNER_TRUE@am__append_3 = plugins/imc_scanner
+@USE_IMV_SCANNER_TRUE@am__append_4 = plugins/imv_scanner
+@USE_IMC_OS_TRUE@am__append_5 = plugins/imc_os
+@USE_IMV_OS_TRUE@am__append_6 = plugins/imv_os
+subdir = src/libimcv
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/config/libtool.m4 \
@@ -95,14 +78,90 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-AM_V_GEN = $(am__v_GEN_@AM_V@)
-am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
-am__v_GEN_0 = @echo "  GEN   " $@;
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(ipseclibdir)" "$(DESTDIR)$(ipsecdir)" \
+	"$(DESTDIR)$(ipsecdir)"
+LTLIBRARIES = $(ipseclib_LTLIBRARIES)
+libimcv_la_DEPENDENCIES = $(top_builddir)/src/libtncif/libtncif.la
+am_libimcv_la_OBJECTS = imcv.lo imc_agent.lo imc_msg.lo imv_agent.lo \
+	imv_database.lo imv_msg.lo imv_lang_string.lo \
+	imv_reason_string.lo imv_remediation_string.lo imv_session.lo \
+	imv_workitem.lo ietf_attr.lo ietf_attr_assess_result.lo \
+	ietf_attr_attr_request.lo ietf_attr_fwd_enabled.lo \
+	ietf_attr_default_pwd_enabled.lo \
+	ietf_attr_installed_packages.lo ietf_attr_numeric_version.lo \
+	ietf_attr_op_status.lo ietf_attr_pa_tnc_error.lo \
+	ietf_attr_port_filter.lo ietf_attr_product_info.lo \
+	ietf_attr_remediation_instr.lo ietf_attr_string_version.lo \
+	ita_attr.lo ita_attr_command.lo ita_attr_dummy.lo \
+	ita_attr_get_settings.lo ita_attr_settings.lo \
+	ita_attr_angel.lo ita_attr_device_id.lo os_info.lo \
+	pa_tnc_msg.lo pa_tnc_attr_manager.lo
+libimcv_la_OBJECTS = $(am_libimcv_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+PROGRAMS = $(ipsec_PROGRAMS)
+am_imv_policy_manager_OBJECTS = imv_policy_manager.$(OBJEXT) \
+	imv_policy_manager_usage.$(OBJEXT)
+imv_policy_manager_OBJECTS = $(am_imv_policy_manager_OBJECTS)
+imv_policy_manager_DEPENDENCIES =  \
+	$(top_builddir)/src/libstrongswan/libstrongswan.la
+SCRIPTS = $(ipsec_SCRIPTS)
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__depfiles_maybe = depfiles
+am__mv = mv -f
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC    " $@;
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-SOURCES =
-DIST_SOURCES =
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN   " $@;
+SOURCES = $(libimcv_la_SOURCES) $(imv_policy_manager_SOURCES)
+DIST_SOURCES = $(libimcv_la_SOURCES) $(imv_policy_manager_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -122,11 +181,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = . include libstrongswan libhydra libipsec libsimaka \
-	libtls libradius libtncif libtnccs libpttls libimcv libpts \
-	libcharon starter ipsec _copyright charon charon-nm stroke \
-	_updown _updown_espmark openac scepclient pki conftest dumm \
-	libfast manager medsrv checksum charon-tkm charon-cmd
+DIST_SUBDIRS = . plugins/imc_test plugins/imv_test plugins/imc_scanner \
+	plugins/imv_scanner plugins/imc_os plugins/imv_os
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -349,19 +405,67 @@ top_srcdir = @top_srcdir@
 urandom_device = @urandom_device@
 xml_CFLAGS = @xml_CFLAGS@
 xml_LIBS = @xml_LIBS@
-SUBDIRS = . include $(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) $(am__append_6) \
-	$(am__append_7) $(am__append_8) $(am__append_9) \
-	$(am__append_10) $(am__append_11) $(am__append_12) \
-	$(am__append_13) $(am__append_14) $(am__append_15) \
-	$(am__append_16) $(am__append_17) $(am__append_18) \
-	$(am__append_19) $(am__append_20) $(am__append_21) \
-	$(am__append_22) $(am__append_23) $(am__append_24) \
-	$(am__append_25) $(am__append_26) $(am__append_27)
-EXTRA_DIST = strongswan.conf
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/src/libstrongswan \
+	-I$(top_srcdir)/src/libtncif
+
+ipseclib_LTLIBRARIES = libimcv.la
+libimcv_la_LIBADD = $(top_builddir)/src/libtncif/libtncif.la
+libimcv_la_SOURCES = \
+	imcv.h imcv.c \
+	imc/imc_agent.h imc/imc_agent.c imc/imc_state.h \
+	imc/imc_msg.h imc/imc_msg.c \
+	imv/imv_agent.h imv/imv_agent.c imv/imv_state.h \
+	imv/imv_agent_if.h imv/imv_if.h \
+	imv/imv_database.h imv/imv_database.c \
+	imv/imv_msg.h imv/imv_msg.c \
+	imv/imv_lang_string.h imv/imv_lang_string.c \
+	imv/imv_reason_string.h imv/imv_reason_string.c \
+	imv/imv_remediation_string.h imv/imv_remediation_string.c \
+	imv/imv_session.h imv/imv_session.c \
+	imv/imv_workitem.h imv/imv_workitem.c \
+	imv/tables.sql imv/data.sql \
+	ietf/ietf_attr.h ietf/ietf_attr.c \
+	ietf/ietf_attr_assess_result.h ietf/ietf_attr_assess_result.c \
+	ietf/ietf_attr_attr_request.h ietf/ietf_attr_attr_request.c \
+	ietf/ietf_attr_fwd_enabled.h ietf/ietf_attr_fwd_enabled.c \
+	ietf/ietf_attr_default_pwd_enabled.h ietf/ietf_attr_default_pwd_enabled.c \
+	ietf/ietf_attr_installed_packages.h ietf/ietf_attr_installed_packages.c \
+	ietf/ietf_attr_numeric_version.h ietf/ietf_attr_numeric_version.c \
+	ietf/ietf_attr_op_status.h ietf/ietf_attr_op_status.c \
+	ietf/ietf_attr_pa_tnc_error.h ietf/ietf_attr_pa_tnc_error.c \
+	ietf/ietf_attr_port_filter.h ietf/ietf_attr_port_filter.c \
+	ietf/ietf_attr_product_info.h ietf/ietf_attr_product_info.c \
+	ietf/ietf_attr_remediation_instr.h ietf/ietf_attr_remediation_instr.c \
+	ietf/ietf_attr_string_version.h ietf/ietf_attr_string_version.c \
+	ita/ita_attr.h ita/ita_attr.c \
+	ita/ita_attr_command.h ita/ita_attr_command.c \
+	ita/ita_attr_dummy.h ita/ita_attr_dummy.c \
+	ita/ita_attr_get_settings.h ita/ita_attr_get_settings.c \
+	ita/ita_attr_settings.h ita/ita_attr_settings.c \
+	ita/ita_attr_angel.h ita/ita_attr_angel.c \
+	ita/ita_attr_device_id.h ita/ita_attr_device_id.c \
+	os_info/os_info.h os_info/os_info.c \
+	pa_tnc/pa_tnc_attr.h \
+	pa_tnc/pa_tnc_msg.h pa_tnc/pa_tnc_msg.c \
+	pa_tnc/pa_tnc_attr_manager.h pa_tnc/pa_tnc_attr_manager.c
+
+ipsec_SCRIPTS = imv/_imv_policy
+EXTRA_DIST = imv/_imv_policy
+imv_policy_manager_SOURCES = \
+	imv/imv_policy_manager.c \
+	imv/imv_policy_manager_usage.h imv/imv_policy_manager_usage.c
+
+imv_policy_manager_LDADD = \
+	$(top_builddir)/src/libstrongswan/libstrongswan.la
+
+#imv/imv_policy_manager.o :	$(top_builddir)/config.status
+SUBDIRS = . $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_6)
 all: all-recursive
 
 .SUFFIXES:
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -371,9 +475,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/libimcv/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/Makefile
+	  $(AUTOMAKE) --gnu src/libimcv/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -392,6 +496,447 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+install-ipseclibLTLIBRARIES: $(ipseclib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	@list='$(ipseclib_LTLIBRARIES)'; test -n "$(ipseclibdir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(ipseclibdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(ipseclibdir)" || exit 1; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(ipseclibdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(ipseclibdir)"; \
+	}
+
+uninstall-ipseclibLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ipseclib_LTLIBRARIES)'; test -n "$(ipseclibdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(ipseclibdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(ipseclibdir)/$$f"; \
+	done
+
+clean-ipseclibLTLIBRARIES:
+	-test -z "$(ipseclib_LTLIBRARIES)" || rm -f $(ipseclib_LTLIBRARIES)
+	@list='$(ipseclib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libimcv.la: $(libimcv_la_OBJECTS) $(libimcv_la_DEPENDENCIES) $(EXTRA_libimcv_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(ipseclibdir) $(libimcv_la_OBJECTS) $(libimcv_la_LIBADD) $(LIBS)
+install-ipsecPROGRAMS: $(ipsec_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	@list='$(ipsec_PROGRAMS)'; test -n "$(ipsecdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(ipsecdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(ipsecdir)" || exit 1; \
+	fi; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p || test -f $$p1; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(ipsecdir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(ipsecdir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-ipsecPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ipsec_PROGRAMS)'; test -n "$(ipsecdir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(ipsecdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(ipsecdir)" && rm -f $$files
+
+clean-ipsecPROGRAMS:
+	@list='$(ipsec_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+imv_policy_manager$(EXEEXT): $(imv_policy_manager_OBJECTS) $(imv_policy_manager_DEPENDENCIES) $(EXTRA_imv_policy_manager_DEPENDENCIES) 
+	@rm -f imv_policy_manager$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(imv_policy_manager_OBJECTS) $(imv_policy_manager_LDADD) $(LIBS)
+install-ipsecSCRIPTS: $(ipsec_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	@list='$(ipsec_SCRIPTS)'; test -n "$(ipsecdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(ipsecdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(ipsecdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n' \
+	    -e 'h;s|.*|.|' \
+	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
+	      if (++n[d] == $(am__install_max)) { \
+		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
+	    else { print "f", d "/" $$4, $$1 } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	     test -z "$$files" || { \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(ipsecdir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(ipsecdir)$$dir" || exit $$?; \
+	     } \
+	; done
+
+uninstall-ipsecSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ipsec_SCRIPTS)'; test -n "$(ipsecdir)" || exit 0; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	       sed -e 's,.*/,,;$(transform)'`; \
+	dir='$(DESTDIR)$(ipsecdir)'; $(am__uninstall_files_from_dir)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_assess_result.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_attr_request.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_default_pwd_enabled.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_fwd_enabled.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_installed_packages.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_numeric_version.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_op_status.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_pa_tnc_error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_port_filter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_product_info.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_remediation_instr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ietf_attr_string_version.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imc_agent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imc_msg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imcv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_agent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_database.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_lang_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_msg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_policy_manager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_policy_manager_usage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_reason_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_remediation_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_session.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imv_workitem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_angel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_device_id.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_dummy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_get_settings.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ita_attr_settings.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/os_info.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pa_tnc_attr_manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pa_tnc_msg.Plo@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+imc_agent.lo: imc/imc_agent.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imc_agent.lo -MD -MP -MF $(DEPDIR)/imc_agent.Tpo -c -o imc_agent.lo `test -f 'imc/imc_agent.c' || echo '$(srcdir)/'`imc/imc_agent.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imc_agent.Tpo $(DEPDIR)/imc_agent.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imc/imc_agent.c' object='imc_agent.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imc_agent.lo `test -f 'imc/imc_agent.c' || echo '$(srcdir)/'`imc/imc_agent.c
+
+imc_msg.lo: imc/imc_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imc_msg.lo -MD -MP -MF $(DEPDIR)/imc_msg.Tpo -c -o imc_msg.lo `test -f 'imc/imc_msg.c' || echo '$(srcdir)/'`imc/imc_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imc_msg.Tpo $(DEPDIR)/imc_msg.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imc/imc_msg.c' object='imc_msg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imc_msg.lo `test -f 'imc/imc_msg.c' || echo '$(srcdir)/'`imc/imc_msg.c
+
+imv_agent.lo: imv/imv_agent.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_agent.lo -MD -MP -MF $(DEPDIR)/imv_agent.Tpo -c -o imv_agent.lo `test -f 'imv/imv_agent.c' || echo '$(srcdir)/'`imv/imv_agent.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_agent.Tpo $(DEPDIR)/imv_agent.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_agent.c' object='imv_agent.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_agent.lo `test -f 'imv/imv_agent.c' || echo '$(srcdir)/'`imv/imv_agent.c
+
+imv_database.lo: imv/imv_database.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_database.lo -MD -MP -MF $(DEPDIR)/imv_database.Tpo -c -o imv_database.lo `test -f 'imv/imv_database.c' || echo '$(srcdir)/'`imv/imv_database.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_database.Tpo $(DEPDIR)/imv_database.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_database.c' object='imv_database.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_database.lo `test -f 'imv/imv_database.c' || echo '$(srcdir)/'`imv/imv_database.c
+
+imv_msg.lo: imv/imv_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_msg.lo -MD -MP -MF $(DEPDIR)/imv_msg.Tpo -c -o imv_msg.lo `test -f 'imv/imv_msg.c' || echo '$(srcdir)/'`imv/imv_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_msg.Tpo $(DEPDIR)/imv_msg.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_msg.c' object='imv_msg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_msg.lo `test -f 'imv/imv_msg.c' || echo '$(srcdir)/'`imv/imv_msg.c
+
+imv_lang_string.lo: imv/imv_lang_string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_lang_string.lo -MD -MP -MF $(DEPDIR)/imv_lang_string.Tpo -c -o imv_lang_string.lo `test -f 'imv/imv_lang_string.c' || echo '$(srcdir)/'`imv/imv_lang_string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_lang_string.Tpo $(DEPDIR)/imv_lang_string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_lang_string.c' object='imv_lang_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_lang_string.lo `test -f 'imv/imv_lang_string.c' || echo '$(srcdir)/'`imv/imv_lang_string.c
+
+imv_reason_string.lo: imv/imv_reason_string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_reason_string.lo -MD -MP -MF $(DEPDIR)/imv_reason_string.Tpo -c -o imv_reason_string.lo `test -f 'imv/imv_reason_string.c' || echo '$(srcdir)/'`imv/imv_reason_string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_reason_string.Tpo $(DEPDIR)/imv_reason_string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_reason_string.c' object='imv_reason_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_reason_string.lo `test -f 'imv/imv_reason_string.c' || echo '$(srcdir)/'`imv/imv_reason_string.c
+
+imv_remediation_string.lo: imv/imv_remediation_string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_remediation_string.lo -MD -MP -MF $(DEPDIR)/imv_remediation_string.Tpo -c -o imv_remediation_string.lo `test -f 'imv/imv_remediation_string.c' || echo '$(srcdir)/'`imv/imv_remediation_string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_remediation_string.Tpo $(DEPDIR)/imv_remediation_string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_remediation_string.c' object='imv_remediation_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_remediation_string.lo `test -f 'imv/imv_remediation_string.c' || echo '$(srcdir)/'`imv/imv_remediation_string.c
+
+imv_session.lo: imv/imv_session.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_session.lo -MD -MP -MF $(DEPDIR)/imv_session.Tpo -c -o imv_session.lo `test -f 'imv/imv_session.c' || echo '$(srcdir)/'`imv/imv_session.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_session.Tpo $(DEPDIR)/imv_session.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_session.c' object='imv_session.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_session.lo `test -f 'imv/imv_session.c' || echo '$(srcdir)/'`imv/imv_session.c
+
+imv_workitem.lo: imv/imv_workitem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_workitem.lo -MD -MP -MF $(DEPDIR)/imv_workitem.Tpo -c -o imv_workitem.lo `test -f 'imv/imv_workitem.c' || echo '$(srcdir)/'`imv/imv_workitem.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_workitem.Tpo $(DEPDIR)/imv_workitem.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_workitem.c' object='imv_workitem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_workitem.lo `test -f 'imv/imv_workitem.c' || echo '$(srcdir)/'`imv/imv_workitem.c
+
+ietf_attr.lo: ietf/ietf_attr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr.lo -MD -MP -MF $(DEPDIR)/ietf_attr.Tpo -c -o ietf_attr.lo `test -f 'ietf/ietf_attr.c' || echo '$(srcdir)/'`ietf/ietf_attr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr.Tpo $(DEPDIR)/ietf_attr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr.c' object='ietf_attr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr.lo `test -f 'ietf/ietf_attr.c' || echo '$(srcdir)/'`ietf/ietf_attr.c
+
+ietf_attr_assess_result.lo: ietf/ietf_attr_assess_result.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_assess_result.lo -MD -MP -MF $(DEPDIR)/ietf_attr_assess_result.Tpo -c -o ietf_attr_assess_result.lo `test -f 'ietf/ietf_attr_assess_result.c' || echo '$(srcdir)/'`ietf/ietf_attr_assess_result.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_assess_result.Tpo $(DEPDIR)/ietf_attr_assess_result.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_assess_result.c' object='ietf_attr_assess_result.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_assess_result.lo `test -f 'ietf/ietf_attr_assess_result.c' || echo '$(srcdir)/'`ietf/ietf_attr_assess_result.c
+
+ietf_attr_attr_request.lo: ietf/ietf_attr_attr_request.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_attr_request.lo -MD -MP -MF $(DEPDIR)/ietf_attr_attr_request.Tpo -c -o ietf_attr_attr_request.lo `test -f 'ietf/ietf_attr_attr_request.c' || echo '$(srcdir)/'`ietf/ietf_attr_attr_request.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_attr_request.Tpo $(DEPDIR)/ietf_attr_attr_request.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_attr_request.c' object='ietf_attr_attr_request.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_attr_request.lo `test -f 'ietf/ietf_attr_attr_request.c' || echo '$(srcdir)/'`ietf/ietf_attr_attr_request.c
+
+ietf_attr_fwd_enabled.lo: ietf/ietf_attr_fwd_enabled.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_fwd_enabled.lo -MD -MP -MF $(DEPDIR)/ietf_attr_fwd_enabled.Tpo -c -o ietf_attr_fwd_enabled.lo `test -f 'ietf/ietf_attr_fwd_enabled.c' || echo '$(srcdir)/'`ietf/ietf_attr_fwd_enabled.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_fwd_enabled.Tpo $(DEPDIR)/ietf_attr_fwd_enabled.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_fwd_enabled.c' object='ietf_attr_fwd_enabled.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_fwd_enabled.lo `test -f 'ietf/ietf_attr_fwd_enabled.c' || echo '$(srcdir)/'`ietf/ietf_attr_fwd_enabled.c
+
+ietf_attr_default_pwd_enabled.lo: ietf/ietf_attr_default_pwd_enabled.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_default_pwd_enabled.lo -MD -MP -MF $(DEPDIR)/ietf_attr_default_pwd_enabled.Tpo -c -o ietf_attr_default_pwd_enabled.lo `test -f 'ietf/ietf_attr_default_pwd_enabled.c' || echo '$(srcdir)/'`ietf/ietf_attr_default_pwd_enabled.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_default_pwd_enabled.Tpo $(DEPDIR)/ietf_attr_default_pwd_enabled.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_default_pwd_enabled.c' object='ietf_attr_default_pwd_enabled.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_default_pwd_enabled.lo `test -f 'ietf/ietf_attr_default_pwd_enabled.c' || echo '$(srcdir)/'`ietf/ietf_attr_default_pwd_enabled.c
+
+ietf_attr_installed_packages.lo: ietf/ietf_attr_installed_packages.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_installed_packages.lo -MD -MP -MF $(DEPDIR)/ietf_attr_installed_packages.Tpo -c -o ietf_attr_installed_packages.lo `test -f 'ietf/ietf_attr_installed_packages.c' || echo '$(srcdir)/'`ietf/ietf_attr_installed_packages.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_installed_packages.Tpo $(DEPDIR)/ietf_attr_installed_packages.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_installed_packages.c' object='ietf_attr_installed_packages.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_installed_packages.lo `test -f 'ietf/ietf_attr_installed_packages.c' || echo '$(srcdir)/'`ietf/ietf_attr_installed_packages.c
+
+ietf_attr_numeric_version.lo: ietf/ietf_attr_numeric_version.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_numeric_version.lo -MD -MP -MF $(DEPDIR)/ietf_attr_numeric_version.Tpo -c -o ietf_attr_numeric_version.lo `test -f 'ietf/ietf_attr_numeric_version.c' || echo '$(srcdir)/'`ietf/ietf_attr_numeric_version.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_numeric_version.Tpo $(DEPDIR)/ietf_attr_numeric_version.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_numeric_version.c' object='ietf_attr_numeric_version.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_numeric_version.lo `test -f 'ietf/ietf_attr_numeric_version.c' || echo '$(srcdir)/'`ietf/ietf_attr_numeric_version.c
+
+ietf_attr_op_status.lo: ietf/ietf_attr_op_status.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_op_status.lo -MD -MP -MF $(DEPDIR)/ietf_attr_op_status.Tpo -c -o ietf_attr_op_status.lo `test -f 'ietf/ietf_attr_op_status.c' || echo '$(srcdir)/'`ietf/ietf_attr_op_status.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_op_status.Tpo $(DEPDIR)/ietf_attr_op_status.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_op_status.c' object='ietf_attr_op_status.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_op_status.lo `test -f 'ietf/ietf_attr_op_status.c' || echo '$(srcdir)/'`ietf/ietf_attr_op_status.c
+
+ietf_attr_pa_tnc_error.lo: ietf/ietf_attr_pa_tnc_error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_pa_tnc_error.lo -MD -MP -MF $(DEPDIR)/ietf_attr_pa_tnc_error.Tpo -c -o ietf_attr_pa_tnc_error.lo `test -f 'ietf/ietf_attr_pa_tnc_error.c' || echo '$(srcdir)/'`ietf/ietf_attr_pa_tnc_error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_pa_tnc_error.Tpo $(DEPDIR)/ietf_attr_pa_tnc_error.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_pa_tnc_error.c' object='ietf_attr_pa_tnc_error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_pa_tnc_error.lo `test -f 'ietf/ietf_attr_pa_tnc_error.c' || echo '$(srcdir)/'`ietf/ietf_attr_pa_tnc_error.c
+
+ietf_attr_port_filter.lo: ietf/ietf_attr_port_filter.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_port_filter.lo -MD -MP -MF $(DEPDIR)/ietf_attr_port_filter.Tpo -c -o ietf_attr_port_filter.lo `test -f 'ietf/ietf_attr_port_filter.c' || echo '$(srcdir)/'`ietf/ietf_attr_port_filter.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_port_filter.Tpo $(DEPDIR)/ietf_attr_port_filter.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_port_filter.c' object='ietf_attr_port_filter.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_port_filter.lo `test -f 'ietf/ietf_attr_port_filter.c' || echo '$(srcdir)/'`ietf/ietf_attr_port_filter.c
+
+ietf_attr_product_info.lo: ietf/ietf_attr_product_info.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_product_info.lo -MD -MP -MF $(DEPDIR)/ietf_attr_product_info.Tpo -c -o ietf_attr_product_info.lo `test -f 'ietf/ietf_attr_product_info.c' || echo '$(srcdir)/'`ietf/ietf_attr_product_info.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_product_info.Tpo $(DEPDIR)/ietf_attr_product_info.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_product_info.c' object='ietf_attr_product_info.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_product_info.lo `test -f 'ietf/ietf_attr_product_info.c' || echo '$(srcdir)/'`ietf/ietf_attr_product_info.c
+
+ietf_attr_remediation_instr.lo: ietf/ietf_attr_remediation_instr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_remediation_instr.lo -MD -MP -MF $(DEPDIR)/ietf_attr_remediation_instr.Tpo -c -o ietf_attr_remediation_instr.lo `test -f 'ietf/ietf_attr_remediation_instr.c' || echo '$(srcdir)/'`ietf/ietf_attr_remediation_instr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_remediation_instr.Tpo $(DEPDIR)/ietf_attr_remediation_instr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_remediation_instr.c' object='ietf_attr_remediation_instr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_remediation_instr.lo `test -f 'ietf/ietf_attr_remediation_instr.c' || echo '$(srcdir)/'`ietf/ietf_attr_remediation_instr.c
+
+ietf_attr_string_version.lo: ietf/ietf_attr_string_version.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ietf_attr_string_version.lo -MD -MP -MF $(DEPDIR)/ietf_attr_string_version.Tpo -c -o ietf_attr_string_version.lo `test -f 'ietf/ietf_attr_string_version.c' || echo '$(srcdir)/'`ietf/ietf_attr_string_version.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ietf_attr_string_version.Tpo $(DEPDIR)/ietf_attr_string_version.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ietf/ietf_attr_string_version.c' object='ietf_attr_string_version.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ietf_attr_string_version.lo `test -f 'ietf/ietf_attr_string_version.c' || echo '$(srcdir)/'`ietf/ietf_attr_string_version.c
+
+ita_attr.lo: ita/ita_attr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr.lo -MD -MP -MF $(DEPDIR)/ita_attr.Tpo -c -o ita_attr.lo `test -f 'ita/ita_attr.c' || echo '$(srcdir)/'`ita/ita_attr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr.Tpo $(DEPDIR)/ita_attr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr.c' object='ita_attr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr.lo `test -f 'ita/ita_attr.c' || echo '$(srcdir)/'`ita/ita_attr.c
+
+ita_attr_command.lo: ita/ita_attr_command.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_command.lo -MD -MP -MF $(DEPDIR)/ita_attr_command.Tpo -c -o ita_attr_command.lo `test -f 'ita/ita_attr_command.c' || echo '$(srcdir)/'`ita/ita_attr_command.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_command.Tpo $(DEPDIR)/ita_attr_command.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_command.c' object='ita_attr_command.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_command.lo `test -f 'ita/ita_attr_command.c' || echo '$(srcdir)/'`ita/ita_attr_command.c
+
+ita_attr_dummy.lo: ita/ita_attr_dummy.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_dummy.lo -MD -MP -MF $(DEPDIR)/ita_attr_dummy.Tpo -c -o ita_attr_dummy.lo `test -f 'ita/ita_attr_dummy.c' || echo '$(srcdir)/'`ita/ita_attr_dummy.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_dummy.Tpo $(DEPDIR)/ita_attr_dummy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_dummy.c' object='ita_attr_dummy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_dummy.lo `test -f 'ita/ita_attr_dummy.c' || echo '$(srcdir)/'`ita/ita_attr_dummy.c
+
+ita_attr_get_settings.lo: ita/ita_attr_get_settings.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_get_settings.lo -MD -MP -MF $(DEPDIR)/ita_attr_get_settings.Tpo -c -o ita_attr_get_settings.lo `test -f 'ita/ita_attr_get_settings.c' || echo '$(srcdir)/'`ita/ita_attr_get_settings.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_get_settings.Tpo $(DEPDIR)/ita_attr_get_settings.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_get_settings.c' object='ita_attr_get_settings.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_get_settings.lo `test -f 'ita/ita_attr_get_settings.c' || echo '$(srcdir)/'`ita/ita_attr_get_settings.c
+
+ita_attr_settings.lo: ita/ita_attr_settings.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_settings.lo -MD -MP -MF $(DEPDIR)/ita_attr_settings.Tpo -c -o ita_attr_settings.lo `test -f 'ita/ita_attr_settings.c' || echo '$(srcdir)/'`ita/ita_attr_settings.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_settings.Tpo $(DEPDIR)/ita_attr_settings.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_settings.c' object='ita_attr_settings.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_settings.lo `test -f 'ita/ita_attr_settings.c' || echo '$(srcdir)/'`ita/ita_attr_settings.c
+
+ita_attr_angel.lo: ita/ita_attr_angel.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_angel.lo -MD -MP -MF $(DEPDIR)/ita_attr_angel.Tpo -c -o ita_attr_angel.lo `test -f 'ita/ita_attr_angel.c' || echo '$(srcdir)/'`ita/ita_attr_angel.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_angel.Tpo $(DEPDIR)/ita_attr_angel.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_angel.c' object='ita_attr_angel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_angel.lo `test -f 'ita/ita_attr_angel.c' || echo '$(srcdir)/'`ita/ita_attr_angel.c
+
+ita_attr_device_id.lo: ita/ita_attr_device_id.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ita_attr_device_id.lo -MD -MP -MF $(DEPDIR)/ita_attr_device_id.Tpo -c -o ita_attr_device_id.lo `test -f 'ita/ita_attr_device_id.c' || echo '$(srcdir)/'`ita/ita_attr_device_id.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ita_attr_device_id.Tpo $(DEPDIR)/ita_attr_device_id.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ita/ita_attr_device_id.c' object='ita_attr_device_id.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ita_attr_device_id.lo `test -f 'ita/ita_attr_device_id.c' || echo '$(srcdir)/'`ita/ita_attr_device_id.c
+
+os_info.lo: os_info/os_info.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT os_info.lo -MD -MP -MF $(DEPDIR)/os_info.Tpo -c -o os_info.lo `test -f 'os_info/os_info.c' || echo '$(srcdir)/'`os_info/os_info.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/os_info.Tpo $(DEPDIR)/os_info.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='os_info/os_info.c' object='os_info.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o os_info.lo `test -f 'os_info/os_info.c' || echo '$(srcdir)/'`os_info/os_info.c
+
+pa_tnc_msg.lo: pa_tnc/pa_tnc_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pa_tnc_msg.lo -MD -MP -MF $(DEPDIR)/pa_tnc_msg.Tpo -c -o pa_tnc_msg.lo `test -f 'pa_tnc/pa_tnc_msg.c' || echo '$(srcdir)/'`pa_tnc/pa_tnc_msg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/pa_tnc_msg.Tpo $(DEPDIR)/pa_tnc_msg.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pa_tnc/pa_tnc_msg.c' object='pa_tnc_msg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pa_tnc_msg.lo `test -f 'pa_tnc/pa_tnc_msg.c' || echo '$(srcdir)/'`pa_tnc/pa_tnc_msg.c
+
+pa_tnc_attr_manager.lo: pa_tnc/pa_tnc_attr_manager.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pa_tnc_attr_manager.lo -MD -MP -MF $(DEPDIR)/pa_tnc_attr_manager.Tpo -c -o pa_tnc_attr_manager.lo `test -f 'pa_tnc/pa_tnc_attr_manager.c' || echo '$(srcdir)/'`pa_tnc/pa_tnc_attr_manager.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/pa_tnc_attr_manager.Tpo $(DEPDIR)/pa_tnc_attr_manager.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pa_tnc/pa_tnc_attr_manager.c' object='pa_tnc_attr_manager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pa_tnc_attr_manager.lo `test -f 'pa_tnc/pa_tnc_attr_manager.c' || echo '$(srcdir)/'`pa_tnc/pa_tnc_attr_manager.c
+
+imv_policy_manager.o: imv/imv_policy_manager.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_policy_manager.o -MD -MP -MF $(DEPDIR)/imv_policy_manager.Tpo -c -o imv_policy_manager.o `test -f 'imv/imv_policy_manager.c' || echo '$(srcdir)/'`imv/imv_policy_manager.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_policy_manager.Tpo $(DEPDIR)/imv_policy_manager.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_policy_manager.c' object='imv_policy_manager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_policy_manager.o `test -f 'imv/imv_policy_manager.c' || echo '$(srcdir)/'`imv/imv_policy_manager.c
+
+imv_policy_manager.obj: imv/imv_policy_manager.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_policy_manager.obj -MD -MP -MF $(DEPDIR)/imv_policy_manager.Tpo -c -o imv_policy_manager.obj `if test -f 'imv/imv_policy_manager.c'; then $(CYGPATH_W) 'imv/imv_policy_manager.c'; else $(CYGPATH_W) '$(srcdir)/imv/imv_policy_manager.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_policy_manager.Tpo $(DEPDIR)/imv_policy_manager.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_policy_manager.c' object='imv_policy_manager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_policy_manager.obj `if test -f 'imv/imv_policy_manager.c'; then $(CYGPATH_W) 'imv/imv_policy_manager.c'; else $(CYGPATH_W) '$(srcdir)/imv/imv_policy_manager.c'; fi`
+
+imv_policy_manager_usage.o: imv/imv_policy_manager_usage.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_policy_manager_usage.o -MD -MP -MF $(DEPDIR)/imv_policy_manager_usage.Tpo -c -o imv_policy_manager_usage.o `test -f 'imv/imv_policy_manager_usage.c' || echo '$(srcdir)/'`imv/imv_policy_manager_usage.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_policy_manager_usage.Tpo $(DEPDIR)/imv_policy_manager_usage.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_policy_manager_usage.c' object='imv_policy_manager_usage.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_policy_manager_usage.o `test -f 'imv/imv_policy_manager_usage.c' || echo '$(srcdir)/'`imv/imv_policy_manager_usage.c
+
+imv_policy_manager_usage.obj: imv/imv_policy_manager_usage.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT imv_policy_manager_usage.obj -MD -MP -MF $(DEPDIR)/imv_policy_manager_usage.Tpo -c -o imv_policy_manager_usage.obj `if test -f 'imv/imv_policy_manager_usage.c'; then $(CYGPATH_W) 'imv/imv_policy_manager_usage.c'; else $(CYGPATH_W) '$(srcdir)/imv/imv_policy_manager_usage.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imv_policy_manager_usage.Tpo $(DEPDIR)/imv_policy_manager_usage.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imv/imv_policy_manager_usage.c' object='imv_policy_manager_usage.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o imv_policy_manager_usage.obj `if test -f 'imv/imv_policy_manager_usage.c'; then $(CYGPATH_W) 'imv/imv_policy_manager_usage.c'; else $(CYGPATH_W) '$(srcdir)/imv/imv_policy_manager_usage.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -591,9 +1136,12 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(ipseclibdir)" "$(DESTDIR)$(ipsecdir)" "$(DESTDIR)$(ipsecdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -626,11 +1174,14 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-ipsecPROGRAMS clean-ipseclibLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -644,13 +1195,14 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-ipsecPROGRAMS install-ipsecSCRIPTS \
+	install-ipseclibLTLIBRARIES
 
 install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-exec-local
+install-exec-am:
 
 install-html: install-html-recursive
 
@@ -673,12 +1225,14 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -688,29 +1242,30 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-ipsecPROGRAMS uninstall-ipsecSCRIPTS \
+	uninstall-ipseclibLTLIBRARIES
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
 	install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am check check-am clean clean-generic clean-libtool \
-	ctags ctags-recursive distclean distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-exec-local install-html \
-	install-html-am install-info install-info-am install-man \
+	all all-am check check-am clean clean-generic \
+	clean-ipsecPROGRAMS clean-ipseclibLTLIBRARIES clean-libtool \
+	ctags ctags-recursive distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-ipsecPROGRAMS \
+	install-ipsecSCRIPTS install-ipseclibLTLIBRARIES install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
 	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am tags tags-recursive uninstall uninstall-am
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-ipsecPROGRAMS \
+	uninstall-ipsecSCRIPTS uninstall-ipseclibLTLIBRARIES
 
-
-install-exec-local :
-		test -e "$(DESTDIR)${sysconfdir}" || $(INSTALL) -d "$(DESTDIR)$(sysconfdir)"
-		test -e "$(DESTDIR)$(sysconfdir)/strongswan.conf" || $(INSTALL) -m 640 $(srcdir)/strongswan.conf $(DESTDIR)$(sysconfdir)/strongswan.conf || true
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
